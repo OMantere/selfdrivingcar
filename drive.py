@@ -70,18 +70,12 @@ class Controller:
         GPIO.setup(self.MotorFront2, GPIO.OUT)
         GPIO.setup(self.MotorFront, GPIO.OUT)
         GPIO.output(self.MotorFront, 0)
-        self.FrontPWM = GPIO.PWM(self.MotorFront,self.freqFrontPWM)
-        self.FrontPWM.start(0)
-        self.FrontPWM.ChangeDutyCycle(0)
 
 
         GPIO.setup(self.MotorBack1, GPIO.OUT)
         GPIO.setup(self.MotorBack2, GPIO.OUT)
         GPIO.setup(self.MotorBack, GPIO.OUT)
         GPIO.output(self.MotorBack, 0)
-        self.BackPWM = GPIO.PWM(self.MotorBack,self.freqBackPWM)
-        self.BackPWM.start(0)
-        self.BackPWM.ChangeDutyCycle(0)
         
         self.FrontSpeed = 0.0
         self.BackSpeed = 0.0
@@ -89,12 +83,12 @@ class Controller:
     def front(self,f1,f2,b):
         GPIO.output(self.MotorFront1, f1)
         GPIO.output(self.MotorFront2, f2)
-        self.FrontPWM.ChangeDutyCycle(b)
+        GPIO.output(self.MotorFront, 1)
 
     def rear(self,b1,b2,b):
         GPIO.output(self.MotorBack1, b1)
         GPIO.output(self.MotorBack2, b2)
-        self.BackPWM.ChangeDutyCycle(b)
+        GPIO.output(self.MotorBack, 1)
     
     def steering(self):
         while True:

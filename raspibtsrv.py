@@ -131,19 +131,34 @@ def main():
                 zsign = max(min(z * 9999999, 1.0), -1.0)
                 z = zsign * max(min(math.sqrt(y*y + z*z), 1.0), -1.0)
 
-                if abs(y) > midcutoff:
-                    y = max(min(y * 9999999, 1.0), -1.0)
+                if abs(y) <= midcutoff:
+                    y = 0
+                elif y > 0.0:
+                    y = 1
+                else:
+                    y = -1
+
+                if abs(z) <= midcutoff:
+                    z = 0
+                elif z > 0.0:
+                    z = 1
+                else:
+                    z = -1
 
                 # Right is positive y
                 # Forward is positive z
-                if z > 0.0:
-                    controller.rear(0, 1, z * 100)
+                if z > 0:
+                    controller.rear(0, 1, 1)
+                elif z < 0:
+                    controller.rear(1, 0, 1)
                 else:
-                    controller.rear(1, 0, -z * 100)
-                if y > 0.0:
-                    controller.front(1, 0, y * 100)
+                    controller.rear(0, 0, 0)
+                if y > 0:
+                    controller.front(1, 0, 1)
+                elif y < 0:
+                    controller.front(0, 1, 1)
                 else:
-                    controller.front(0, 1, -y * 100)
+                    controller.front(0, 0, 0)
 
             elif header == 'reset':
                 reset_motors()

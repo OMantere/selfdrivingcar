@@ -10,6 +10,19 @@ from bluetooth import *
 from drive import Controller
 import math
 
+def read_temp():
+    #!/usr/bin/env python
+    import subprocess
+    # Temp=20.5*  Humidity=28.4%
+
+    batcmd="/home/pi/Adafruit_Python_DHT/examples/AdafruitDHT.py 2302 4"
+    result = subprocess.check_output(batcmd, shell=True)
+    temp = result.split("Temp=")[1][:4]
+    hum = result.split("Humidity=")[1][:4]
+    print("Temp:", temp)
+    print("Humidity:",hum)
+    return temp, hum
+
 
 class LoggerHelper(object):
     def __init__(self, logger, level):
@@ -114,54 +127,9 @@ def main():
                 client_sock, client_info = server_sock.accept()
                 print "Accepted connection from ", client_info
 
-            # Read the data sent by the client
-            data = client_sock.recv(1024)
-            if len(data) == 0:
-                print "Len of data was 0"
-                break
-
-            print "Received [%s]" % data
-            values = data.strip().split()
-            header = values[0]
-
-            if header == 'data':
-                #x = max(min(float(values[1]) / normalize_c, 1.0), -1.0)
-                y = max(min(float(values[2]) / normalize_c, 1.0), -1.0)
-                z = max(min(float(values[3]) * premult_rear / normalize_c, 1.0), -1.0)
-                zsign = max(min(z * 9999999, 1.0), -1.0)
-                z = zsign * max(min(math.sqrt(y*y + z*z), 1.0), -1.0)
-
-                if abs(y) <= midcutoff:
-                    y = 0
-                elif y > 0.0:
-                    y = 1
-                else:
-                    y = -1
-
-                if abs(z) <= midcutoff:
-                    z = 0
-                elif z > 0.0:
-                    z = 1
-                else:
-                    z = -1
-
-                # Right is positive y
-                # Forward is positive z
-                if z > 0:
-                    controller.rear(0, 1, 1)
-                elif z < 0:
-                    controller.rear(1, 0, 1)
-                else:
-                    controller.rear(0, 0, 0)
-                if y > 0:
-                    controller.front(1, 0, 1)
-                elif y < 0:
-                    controller.front(0, 1, 1)
-                else:
-                    controller.front(0, 0, 0)
-
-            elif header == 'reset':
-                reset_motors()
+            time.sleep(0.5)
+            temp, hum = read_temp()
+            data = client_sock.send(str(temp) + str(hum))
 
         except IOError:
             pass

@@ -9,6 +9,7 @@ import time
 from bluetooth import *
 from drive import Controller
 import math
+from carpwm import *
 
 def read_temp():
     #!/usr/bin/env python
@@ -109,9 +110,7 @@ def main():
     midcutoff = 0.15
     premult_rear = 1.5
 
-    def reset_motors():
-        controller.front(0, 0, 0);
-        controller.rear(0, 0, 0);
+    control = CarControl(40, 7)
 
     # Main Bluetooth server loop
     while True:
@@ -127,9 +126,18 @@ def main():
                 client_sock, client_info = server_sock.accept()
                 print "Accepted connection from ", client_info
 
-            time.sleep(0.5)
-            temp, hum = read_temp()
-            data = client_sock.send(str(temp) + str(hum))
+            # Read data sent by client
+            data = client_sock.recv(1024)
+            if len(data) == 0:
+                print("Len of data was 0")
+                break
+            print("Received [%s]" % data)
+            values = data.strip().split()
+            header = values[0]
+            
+            if header == 'control':
+                if values
+                control
 
         except IOError:
             pass

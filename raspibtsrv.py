@@ -12,7 +12,7 @@ from carpwm import *
 import traceback
 import time
 import multiprocessing
-from PyImageStream.main import ws_main
+from main import ws_main
 
 
 class LoggerHelper(object):
